@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Teste Moip</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />        
+        <script type='text/javascript' src='https://desenvolvedor.moip.com.br/sandbox/transparente/MoipWidget-v2.js' charset='ISO-8859-1'>
+        <script type='text/javascript'>
+          var funcaoSucesso = function(data){
+              alert('Sucesso\n' + JSON.stringify(data));
+              window.open(data.url);
+          };
+
+          var funcaoFalha = function(data) {
+              alert('Falha\n' + JSON.stringify(data));
+          };
+
+          pagarBoleto = function() {
+              var settings = {
+                  "Forma": "BoletoBancario"
+              }
+              MoipWidget(settings);
+          }
+
+          pagarCartao = function() {
+              var settings = {
+              "Forma": "CartaoCredito",
+              "Instituicao": "Visa",
+              "Parcelas": "1",
+              "CartaoCredito": {
+                  "Numero": "4000000000000004",
+                  "Expiracao": "12/18",
+                  "CodigoSeguranca": "123",
+                  "Portador": {
+                      "Nome": "Nome Sobrenome",
+                      "DataNascimento": "30/12/1987",
+                      "Telefone": "(11)3165-4020",
+                      "Identidade": "222.222.222-22"
+                      }
+                  }
+              }
+              MoipWidget(settings);
+          }
+
+          // ---- EXEMPLO DE CARTOES PARA TESTE ----//
+          /*
+          AMEX: 376411112222331
+          MASTERCARD: 5555666677778884
+          DINERS: 30111122223331
+          VISA: 4073020000000002
+          HIPERCARD: 3841001111222233334
+          AURA: 5078601870000127985 ou 5078601800003247449
+          */
+        </script>
+    </head>
+    <body>
+        <div>
+          <main>
+            <div>
+              <section>
+                <div class="row">
+                    <h3>Botões para processar a JS/JSON de Pagamento</h3>
+                    <div class="col-md-4">
+                        <div id="MoipWidget"
+                                data-token="{{response.token}}"
+                                callback-method-success="funcaoSucesso"
+                                callback-method-error="funcaoFalha">
+                        </div>
+                        <button id="pagarBoleto" onclick="pagarBoleto()" class="btn btn-default"> Imprimir Boleto </button>
+                        <button id="pagarCartao" onclick="pagarCartao()" class="btn btn-default"> Pagar Cartão </button>
+                    </div>
+                </div>
+                <h3>Ambiente</h3>
+                {{moip.descricao}}
+                <h3>URL de Ambiente</h3>
+                {{moip.url_ambiente}}
+                <h3>Objeto Response</h3>
+                {{response}}
+                <br><br>
+                <h3>Token do Pagamento</h3>
+                {{response.token}}
+                <h3>Status de Resposta</h3>
+                {{response.status}}
+                <br><br>
+                <h3>XML Construido</h3>
+                {{xml}}   
+                <br><br>
+                <h3>Resposta do servidor do Moip</h3>
+                {{response.conteudo}} 
+                <br><br>
+              </section>
+            </div>
+          </main>
+        </div>
+    </body>
+  </html>

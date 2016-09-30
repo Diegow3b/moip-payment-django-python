@@ -16,6 +16,10 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 
+from moip import views
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    
+    url(r'^$', views.testador_moip, name='testador_moip'),
 ]

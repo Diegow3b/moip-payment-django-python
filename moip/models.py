@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
 from xml.etree.ElementTree import Element, SubElement, Comment, tostring
@@ -15,6 +16,9 @@ class RespostaMoIP:
     codigo = ''
     status = ''
     token = ''
+
+    def __unicode__(self):
+        return "Moip Response"
     
     def __init__(self):
         self.conteudo = ''
@@ -34,28 +38,39 @@ class RespostaMoIP:
         self.status = child_status.text
         self.token = child_token.text
 
-class ConfiguracaoMoIP(model.Models):
-    
+# Para Forma de pagamento favor chegar a referencia no moip
+class FormaPagamento(models.Model):    
+    descricao = models.CharField(max_length=100) # Campo de Apresentacao
+    key = models.CharField(max_length=10) # Campo de referencia para o Moip
+    def __unicode__(self):
+        return self.descricao
+
+class Moip(models.Model):
+    # Modelo Administrativo para facil acesso na troca de instancias pelo admin
+    titulo = models.CharField(max_length=100)
+    apelido = models.CharField(max_length=100)
     razao = models.CharField(max_length=100)
     login_moip = models.CharField(max_length=100)
-    boleto_imagem = models.ImageField(null=True, blank=True, upload_to='uploads/moip/img/')
-    url_notificacao = models.CharField(max_length=100, validators=[URLValidator()])
+    boleto_imagem = models.FileField(null=True, blank=True, upload_to='uploads/moip/img/')
+    url_notificacao = models.CharField(null=True, blank=True, max_length=100, validators=[URLValidator()])
     url_retorno = models.CharField(max_length=100, validators=[URLValidator()])
     url_ambiente = models.TextField(max_length=2000, validators=[URLValidator()])
     token_moip = models.CharField(max_length=200)
     key_moip = models.CharField(max_length=200)
-    moeda = models.CharField(default="BRL")
+    moeda = models.CharField(max_length=3, default="BRL")
+    formas_pagamento = models.ManyToManyField(FormaPagamento, related_name="formas_pagamento")
 
     def __unicode__(self):
         return self.razao
 
     def enviar_xml(self, xml):
-        try:            
+        try:   
+            curl = pycurl.Curl()
+
             response = RespostaMoIP()
             passwd = "{0}:{1}".format(self.token_moip, self.key_moip)
             passwd64 = base64.b64encode(passwd)
             
-            curl = pycurl.Curl()
             curl.setopt(pycurl.URL,self.url_ambiente)
             curl.setopt(pycurl.HTTPHEADER,["Authorization: Basic "+passwd64])
             curl.setopt(pycurl.USERAGENT,"Mozilla/4.0")
@@ -73,29 +88,40 @@ class ConfiguracaoMoIP(model.Models):
 
         return response
 
-     def construtor_xml(self, **kwargs):
+    def construir_xml(self, **kwargs):
+        print kwargs
         # --- Seguir determinados parametros para a construcao do xml --- #
-        valor = "200"
-        tipo_pagamento = "InstrucaoUnica"
-        if_proprio = None # Nao quero criar pagamentos unicos
-        apelido = "Meu Apelido"
-        pagador_nome = "Diego Vinicius"
-        pagador_email = "email@email.com"
-        pagador_codigo = "!"
-        pagador_endereco = "Rua abde"
-        pagador_complemento = "Perto dali"
-        pagador_bairro = "Barra"
-        pagador_cidade = "Salvador"
-        pagador_estado = "BA"
-        pagador_pais = "BRA"
-        pagador_cep = "40130130"
-        pagador_telefone = "7188779944"
-        quantidade_periocidade = None
-        tipo_periocidade = None
-        parcela_minima = "2"
-        parcela_maxima = "12"
+        # -- Parametros obrigatórios -- #
+        # Obs.: Razao tambem é obrigario mas nesse caso ele vem da referencia do objeto no self
+        id_proprio = kwargs.pop('id', None)
+        valor = kwargs.pop('valor', None) 
+        tipo_pagamento = kwargs.pop('tipo_pagamento', None)
+         # -- Usado para Pagamentos Recorrentes
+        tipo_periocidade = kwargs.pop('tipo_periocidade', None)
+        quantidade_periocidade = kwargs.pop('quantidade_periocidade', None)
+        # -- Pagador - Uma vez definido o pagador o resto dos campos de pagadores todos sao obrigatorios
+        # com exceção de complemento
+        pagador_nome = kwargs.pop('pagador_nome', None)
+        pagador_email = kwargs.pop('pagador_email', None)
+        pagador_id = kwargs.pop('pagador_id', None)
+        pagador_endereco = kwargs.pop('pagador_endereco', None)
+        pagador_numero = kwargs.pop('pagador_numero', None)
+        pagador_complemento = kwargs.pop('pagador_complemento', None)
+        pagador_bairro = kwargs.pop('pagador_bairro', None)
+        pagador_cidade = kwargs.pop('pagador_cidade', None)
+        pagador_estado = kwargs.pop('pagador_estado', None)
+        pagador_pais = kwargs.pop('pagador_pais', None)
+        pagador_cep = kwargs.pop('pagador_cep', None)
+        pagador_telefone = kwargs.pop('pagador_telefone', None)
+        # -- Definir regras de parcelas, para mais informações como controle de juros cem cada parcela
+        # acessar a documentação do moip
+        parcela_minima = kwargs.pop('parcela_minima', None)
+        parcela_maxima = kwargs.pop('parcela_maxima', None)
+        # Mensagem de identificacao do pagamento
+        mensagem = kwargs.pop('mensagem', None)
         
-        valor = str(valor.replace(',','.'))
+        if valor:
+            valor = str(valor.replace(',','.'))
         # ----- Corpo Inicial ----- #
         node_enviar_instrucao = Element('EnviarInstrucao')
         # ----- Campos Obrigatórios ----- #
@@ -114,21 +140,20 @@ class ConfiguracaoMoIP(model.Models):
         if id_proprio:
             node_id_proprio = SubElement(node_instrucao, 'IdProprio')
             node_id_proprio.text = id_proprio
-        # ----- selfuração do Recebedor ----- #
+        # ----- Configuração do Recebedor ----- #
         node_recebedor = SubElement(node_instrucao, 'Recebedor')
         node_login_moip = SubElement(node_recebedor, 'LoginMoIP')
-        node_login_moip.text = self.login
+        node_login_moip.text = self.login_moip
         node_apelido = SubElement(node_recebedor, 'Apelido')
-        node_apelido.text = apelido
-        # ----- selfuração do Pagador ----- #
+        node_apelido.text = self.apelido
+        # ----- Configuração do Pagador ----- #
         node_pagador = SubElement(node_instrucao, 'Pagador')
         node_nome = SubElement(node_pagador, 'Nome')
         node_nome.text = pagador_nome
         node_email = SubElement(node_pagador, 'Email')
         node_email.text = pagador_email
         node_id_pagador = SubElement(node_pagador, 'IdPagador')
-        node_id_pagador.text = pagador_id
-        # ----- selfuração do Endereço do Pagador ----- # 
+        node_id_pagador.text = pagador_id        
         node_endereco_cobranca = SubElement(node_pagador, 'EnderecoCobranca')
         node_logradouro = SubElement(node_endereco_cobranca, 'Logradouro')
         node_logradouro.text = pagador_endereco
@@ -187,9 +212,11 @@ class ConfiguracaoMoIP(model.Models):
             maximo_parcela.text = parcela_maxima       
 
         # ----- URL de retorno para notificação ----- #
-        node_url_notificacao = SubElement(node_instrucao, 'URLNotificacao')
-        # url_notificacao.text = "{% url '{0}' %}".format(self.url_notificacao)
-        node_url_notificacao.text = self.url_notificacao
+        # Se não for passada nenhuma será utilizada a que foi registrada na sua conta do moip
+        if url_notificacao:
+            node_url_notificacao = SubElement(node_instrucao, 'URLNotificacao')
+            # url_notificacao.text = "{% url '{0}' %}".format(self.url_notificacao)
+            node_url_notificacao.text = self.url_notificacao
         # ----- URL de retorno apos o pagamento ----- #
         node_url_retorno = SubElement(node_instrucao, 'URLRetorno')
         # url_retorno.text = "{% url '{0}' %}".format(self.url_retorno)
