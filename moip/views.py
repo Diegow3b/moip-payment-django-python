@@ -55,7 +55,7 @@ def testador_moip(request):
         pagador_telefone = pagador_telefone,
         parcela_minima = parcela_minima,
         parcela_maxima = parcela_maxima,
-        #id = pagamento_id
+        #id = pagamento_id # Se quiser gerar um pagamento unico por id, descomente essa linha
     )
     
     response = moip.enviar_xml(xml)
@@ -64,6 +64,7 @@ def testador_moip(request):
         'response': response,
         'xml': xml,
         'request': request,
+        'moip': moip
     }
 
     return render(request, 'moip/index.html', context)

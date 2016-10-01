@@ -22,6 +22,27 @@
                 MoipWidget(settings);
             }
 
+            pagarCofre = function() {
+                var settings = {
+                    "Forma": "CartaoCredito",
+                    "Instituicao": "Visa",
+                    "Parcelas": "1",
+                    "CartaoCredito": {
+                        "Cofre": "0b2118bc-fdca-4a57-9886-366326a8a647",
+                        "CodigoSeguranca": "123"
+                        }
+                }
+                MoipWidget(settings);
+            }
+            
+            pagarDebito = function() {
+                var settings = {
+                    "Forma": "DebitoBancario",
+                    "Instituicao": "Itau"
+                }
+                MoipWidget(settings);
+            }
+
             pagarCartao = function() {
               var settings = {
               "Forma": "CartaoCredito",
@@ -57,11 +78,13 @@
                                 callback-method-error="funcaoFalha">
                         </div>
                         <button id="pagarBoleto" onclick="pagarBoleto()" class="btn btn-default"> Imprimir Boleto </button>
+                        <button id="pagarDebito" onclick="pagarDebito()" class="btn btn-default"> Débito em Conta </button>
                         <button id="pagarCartao" onclick="pagarCartao()" class="btn btn-default"> Pagar Cartão </button>
+                        <button id="pagarCofre" onclick="pagarCofre()" class="btn btn-default"> Pagar Cofre </button>
                     </div>
                 </div>
                 <h3>Ambiente</h3>
-                {{moip.descricao}}
+                {{moip.titulo}}
                 <h3>URL de Ambiente</h3>
                 {{moip.url_ambiente}}
                 <h3>Objeto Response</h3>
