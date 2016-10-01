@@ -89,7 +89,6 @@ class Moip(models.Model):
         return response
 
     def construir_xml(self, **kwargs):
-        print kwargs
         # --- Seguir determinados parametros para a construcao do xml --- #
         # -- Parametros obrigatórios -- #
         # Obs.: Razao tambem é obrigario mas nesse caso ele vem da referencia do objeto no self
@@ -213,7 +212,7 @@ class Moip(models.Model):
 
         # ----- URL de retorno para notificação ----- #
         # Se não for passada nenhuma será utilizada a que foi registrada na sua conta do moip
-        if url_notificacao:
+        if self.url_notificacao:
             node_url_notificacao = SubElement(node_instrucao, 'URLNotificacao')
             # url_notificacao.text = "{% url '{0}' %}".format(self.url_notificacao)
             node_url_notificacao.text = self.url_notificacao

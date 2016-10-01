@@ -1,0 +1,105 @@
+[
+// --------- Carregamento do Super Usuario --------- //
+  {
+  "model": "auth.user",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$30000$b6xGNrzDQzdV$XU9yZiKcx3ApUmD0uxzAT9kEQeSgpOzCj+HAR0RnqHI=",
+    "last_login": "2016-10-01T10:19:55.460Z",
+    "is_superuser": true,
+    "username": "admin",
+    "first_name": "",
+    "last_name": "",
+    "email": "email@email.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2016-09-30T09:59:53.924Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+// --------- Carregamento as Formas de Pagamento --------- //
+{
+  "fields": {
+    "key": "BoletoBancario",
+    "descricao": "Boleto Banc\u00e1rio"
+  },
+  "model": "moip.formapagamento",
+  "pk": 1
+},
+{
+  "fields": {
+    "key": "CartaoDeCredito",
+    "descricao": "Cart\u00e3o de Cr\u00e9dito"
+  },
+  "model": "moip.formapagamento",
+  "pk": 2
+},
+{
+  "fields": {
+    "key": "CartaoDeDebito",
+    "descricao": "Cart\u00e3o de D\u00e9bito"
+  },
+  "model": "moip.formapagamento",
+  "pk": 3
+},
+{
+  "fields": {
+    "key": "FinanciamentoBancario",
+    "descricao": "Financiamento Banc\u00e1rio"
+  },
+  "model": "moip.formapagamento",
+  "pk": 4
+},
+{
+  "fields": {
+    "key": "CarteiraMoIP",
+    "descricao": "Carteira MoIP"
+  },
+  "model": "moip.formapagamento",
+  "pk": 5
+},
+{
+  "fields": {
+    "key": "CartaoCredito",
+    "descricao": "Cart\u00e3o Credito (IntrucaoUnica)"
+  },
+  "model": "moip.formapagamento",
+  "pk": 6
+},
+{
+  "fields": {
+    "key": "CartaoDebito",
+    "descricao": "Cart\u00e3o Debito (InstrucaoUnica)"
+  },
+  "model": "moip.formapagamento",
+  "pk": 7
+},
+// --------- Carregamento um Configuração Base para o Moip --------- //
+{
+  "model": "moip.moip",
+  "pk": 1,
+  "fields": {
+    "titulo": "Teste",
+    "apelido": "Teste",
+    "razao": "Teste",
+    "login_moip": "teste@email.com",
+    "boleto_imagem": "",
+    "url_notificacao": "http://localhost:8000/notificacao/",
+    "url_retorno": "http://localhost:8000/",
+    "url_ambiente": "https://desenvolvedor.moip.com.br/sandbox/ws/alpha/EnviarInstrucao/Unica",
+    "token_moip": "01010101010101010101010101010101",
+    "key_moip": "ABABABABABABABABABABABABABABABABABABABAB",
+    "moeda": "BRL",
+    "formas_pagamento": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ]
+  }
+}
+]
