@@ -3,26 +3,26 @@
     <head>
         <title>Teste Moip</title>
         <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />        
-        <script type='text/javascript' src='https://desenvolvedor.moip.com.br/sandbox/transparente/MoipWidget-v2.js' charset='ISO-8859-1'>
-        <script type='text/javascript'>
-          var funcaoSucesso = function(data){
-              alert('Sucesso\n' + JSON.stringify(data));
-              window.open(data.url);
-          };
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
+        <script type='text/javascript' src='https://desenvolvedor.moip.com.br/sandbox/transparente/MoipWidget-v2.js' charset='ISO-8859-1'></script>
+        <script type="text/javascript">
+            var funcaoSucesso = function(data){
+                alert('Sucesso\n' + JSON.stringify(data));
+                window.open(data.url);
+            };
+ 
+            var funcaoFalha = function(data) {
+                alert('Falha\n' + JSON.stringify(data));
+            };
+ 
+            pagarBoleto = function() {
+                var settings = {
+                    "Forma": "BoletoBancario"
+                }
+                MoipWidget(settings);
+            }
 
-          var funcaoFalha = function(data) {
-              alert('Falha\n' + JSON.stringify(data));
-          };
-
-          pagarBoleto = function() {
-              var settings = {
-                  "Forma": "BoletoBancario"
-              }
-              MoipWidget(settings);
-          }
-
-          pagarCartao = function() {
+            pagarCartao = function() {
               var settings = {
               "Forma": "CartaoCredito",
               "Instituicao": "Visa",
@@ -41,17 +41,7 @@
               }
               MoipWidget(settings);
           }
-
-          // ---- EXEMPLO DE CARTOES PARA TESTE ----//
-          /*
-          AMEX: 376411112222331
-          MASTERCARD: 5555666677778884
-          DINERS: 30111122223331
-          VISA: 4073020000000002
-          HIPERCARD: 3841001111222233334
-          AURA: 5078601870000127985 ou 5078601800003247449
-          */
-        </script>
+        </script>               
     </head>
     <body>
         <div>
@@ -93,4 +83,5 @@
           </main>
         </div>
     </body>
+    
   </html>
